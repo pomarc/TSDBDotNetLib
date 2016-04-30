@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSDBDotNetLib", "TSDBDotNetLib\TSDBDotNetLib.csproj", "{8DE7F2EC-F5BE-4BF8-9B3C-CFDBA450C7E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSDBTests", "TSDBTests\TSDBTests.csproj", "{5F517AEF-B3DA-4ABA-AC0B-E8E116AF965E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTester", "ConsoleTester\ConsoleTester.csproj", "{E5D9B5D6-03E4-41B3-B6BF-3D86E59A8EB3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DE7F2EC-F5BE-4BF8-9B3C-CFDBA450C7E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE7F2EC-F5BE-4BF8-9B3C-CFDBA450C7E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DE7F2EC-F5BE-4BF8-9B3C-CFDBA450C7E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DE7F2EC-F5BE-4BF8-9B3C-CFDBA450C7E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F517AEF-B3DA-4ABA-AC0B-E8E116AF965E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F517AEF-B3DA-4ABA-AC0B-E8E116AF965E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F517AEF-B3DA-4ABA-AC0B-E8E116AF965E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F517AEF-B3DA-4ABA-AC0B-E8E116AF965E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5D9B5D6-03E4-41B3-B6BF-3D86E59A8EB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5D9B5D6-03E4-41B3-B6BF-3D86E59A8EB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5D9B5D6-03E4-41B3-B6BF-3D86E59A8EB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5D9B5D6-03E4-41B3-B6BF-3D86E59A8EB3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
