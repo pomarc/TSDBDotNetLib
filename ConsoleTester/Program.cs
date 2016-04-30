@@ -163,8 +163,9 @@ namespace ConsoleTester
         }
         static void Main(string[] args)
         {
-
-            _connector = new Connector("");
+            //you should put your server name in a server.txt text file inside the /bin/debug dir
+            var serverName = System.IO.File.ReadAllText("server.txt");
+            _connector = new Connector(serverName);
             _diagnosticConnector = new Connector("http://localhost:4242");
             _diagnosticMetric = new Metric("diagnostics.elapsed");
             _diagnosticMetric.Tags.Add("server", "dockercloud");
