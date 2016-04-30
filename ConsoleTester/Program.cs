@@ -163,8 +163,8 @@ namespace ConsoleTester
         }
         static void Main(string[] args)
         {
- 
-            _connector = new Connector("http://dockercloud-c776d6f5.cloudapp.net:4242");
+
+            _connector = new Connector("");
             _diagnosticConnector = new Connector("http://localhost:4242");
             _diagnosticMetric = new Metric("diagnostics.elapsed");
             _diagnosticMetric.Tags.Add("server", "dockercloud");
