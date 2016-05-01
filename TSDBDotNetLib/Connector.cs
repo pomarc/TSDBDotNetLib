@@ -385,6 +385,10 @@ namespace TSDBDotNetLib
                 DiagnosticCounters.LastQueryResponseSize = content.Count();
 
                 var results = JsonConvert.DeserializeObject<QueryResult[]>(content);
+                if (results==null|| results.Count() == 0)
+                {
+                    return new QueryResult();
+                }
                 return results[0];
 
             }
