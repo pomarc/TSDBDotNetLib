@@ -32,7 +32,7 @@ namespace TSDBDotNetLib
         public Metric(Metric baseMetric)
         {
             Key = baseMetric.Key ;
-            Tags = new Dictionary<string, string>();
+            Tags = new Dictionary<string, string>(baseMetric.Tags);
         }
     }
 }

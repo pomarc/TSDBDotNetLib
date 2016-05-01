@@ -20,7 +20,7 @@ namespace TSDBDotNetLib
 
         public PutOptions           HttpPutOptions { get; set; }
         public bool                 EnqueueFailedDatapoints { get; set; }
-        public Diagnostics          DIagnosticCounters { get; set; }
+        public Diagnostics          DiagnosticCounters { get; set; }
         internal OTSDBException LastException { get; private set; }
 
         public delegate void OTSDBErrorDelegate(OTSDBException exception, Exception originalException);
@@ -31,7 +31,7 @@ namespace TSDBDotNetLib
         public Connector(string url, bool enableDiagnostics=true )
         {
             _ServerUri = new Uri(url);
-            DIagnosticCounters = new Diagnostics();
+            DiagnosticCounters = new Diagnostics();
             _useDiagnostics = enableDiagnostics;
             HttpPutOptions = new PutOptions();
             VersionInfos = new VersionInfo();
@@ -46,13 +46,12 @@ namespace TSDBDotNetLib
             {
                 if (_useDiagnostics)
                 {
-                    DIagnosticCounters.StartDate = DateTime.Now;
+                    DiagnosticCounters.StartDate = DateTime.Now;
                 }
                 HttpWebRequest http = (HttpWebRequest)WebRequest.Create(_ServerUri + "api/version");
                 http.SendChunked = false;
                 http.Method = "GET";
-                // http.Headers.Clear();
-                //http.Headers.Add("Content-Type", "application/json");
+ 
                 http.ContentType = "application/json";
                 WebResponse response = await http.GetResponseAsync();
                 var sw = System.Diagnostics.Stopwatch.StartNew();
@@ -60,10 +59,10 @@ namespace TSDBDotNetLib
               
                 var stream = response.GetResponseStream();
                 sw.Stop();
-                DIagnosticCounters.LastQueryElapsedMs = sw.ElapsedMilliseconds;
+                DiagnosticCounters.LastQueryElapsedMs = sw.ElapsedMilliseconds;
                 StreamReader sr = new StreamReader(stream);
                 string content = sr.ReadToEnd();
-                DIagnosticCounters.LastQueryResponseSize = content.Count();
+                DiagnosticCounters.LastQueryResponseSize = content.Count();
                 VersionInfos = JsonConvert.DeserializeObject<VersionInfo>(content);
 
                
@@ -115,7 +114,7 @@ namespace TSDBDotNetLib
             {
                 if (_useDiagnostics)
                 {
-                    DIagnosticCounters.SentDatapoints+=(ulong)dataPoints.Count();
+                    DiagnosticCounters.SentDatapoints+=(ulong)dataPoints.Count();
                 }
 
 
@@ -162,21 +161,21 @@ namespace TSDBDotNetLib
                     stream.Close();
                 }
 
-                this.DIagnosticCounters.PendingPutRequests++;
+                this.DiagnosticCounters.PendingPutRequests++;
                 var sw = System.Diagnostics.Stopwatch.StartNew();
 
                 //request -------------
                 WebResponse response = await http.GetResponseAsync();
 
                 sw.Stop();
-                DIagnosticCounters.LastQueryElapsedMs = sw.ElapsedMilliseconds;
+                DiagnosticCounters.LastQueryElapsedMs = sw.ElapsedMilliseconds;
 
                 var streamOutput = response.GetResponseStream();
 
                 StreamReader sr = new StreamReader(streamOutput);
                 string content = sr.ReadToEnd();
 
-                DIagnosticCounters.LastQueryResponseSize = response.ContentLength;
+                DiagnosticCounters.LastQueryResponseSize = response.ContentLength;
 
                 if (_useDiagnostics)
                 {
@@ -186,11 +185,11 @@ namespace TSDBDotNetLib
 
                         dynamic converter = Newtonsoft.Json.JsonConvert.DeserializeObject<PutDetails>(content);
 
-                        DIagnosticCounters.SuccessfulSentDatapoints += (ulong) converter.success;
-                        DIagnosticCounters.FailedSentDatapoints += (ulong)converter.failed;
+                        DiagnosticCounters.SuccessfulSentDatapoints += (ulong) converter.success;
+                        DiagnosticCounters.FailedSentDatapoints += (ulong)converter.failed;
                         if (converter.success > 0)
                         {
-                            DIagnosticCounters.LastSuccessfulPut = DateTime.Now;
+                            DiagnosticCounters.LastSuccessfulPut = DateTime.Now;
                         }
                        
 
@@ -198,8 +197,8 @@ namespace TSDBDotNetLib
                     }
                     else
                     {
-                        DIagnosticCounters.SuccessfulSentDatapoints++;
-                        DIagnosticCounters.LastSuccessfulPut = DateTime.Now;
+                        DiagnosticCounters.SuccessfulSentDatapoints++;
+                        DiagnosticCounters.LastSuccessfulPut = DateTime.Now;
                     }
                  
                 }
@@ -223,7 +222,7 @@ namespace TSDBDotNetLib
               
                 if (_useDiagnostics)
                 {
-                    DIagnosticCounters.FailedSentDatapoints+=(ulong)dataPoints.Count();
+                    DiagnosticCounters.FailedSentDatapoints+=(ulong)dataPoints.Count();
                 }
                 if (OnOTSDBError != null)
                 {
@@ -236,7 +235,7 @@ namespace TSDBDotNetLib
                 if (_useDiagnostics)
                 {
 
-                    DIagnosticCounters.FailedSentDatapoints += (ulong)dataPoints.Count();
+                    DiagnosticCounters.FailedSentDatapoints += (ulong)dataPoints.Count();
                 }
                 if (OnOTSDBError != null)
                 {
@@ -245,7 +244,7 @@ namespace TSDBDotNetLib
             }
             finally
             {
-                this.DIagnosticCounters.PendingPutRequests--;
+                this.DiagnosticCounters.PendingPutRequests--;
             }
 
             return;
@@ -256,7 +255,7 @@ namespace TSDBDotNetLib
             {
                 if (_useDiagnostics)
                 {
-                    DIagnosticCounters.SentDatapoints++;
+                    DiagnosticCounters.SentDatapoints++;
                 }
 
                     
@@ -282,7 +281,7 @@ namespace TSDBDotNetLib
                     stream.Close();
                 }
 
-                this.DIagnosticCounters.PendingPutRequests++;
+                this.DiagnosticCounters.PendingPutRequests++;
                 WebResponse response = await http.GetResponseAsync();
 
                 var streamOutput = response.GetResponseStream();
@@ -291,8 +290,8 @@ namespace TSDBDotNetLib
 
                 if (_useDiagnostics)
                 {
-                    DIagnosticCounters.SuccessfulSentDatapoints++;
-                    DIagnosticCounters.LastSuccessfulPut = DateTime.Now;
+                    DiagnosticCounters.SuccessfulSentDatapoints++;
+                    DiagnosticCounters.LastSuccessfulPut = DateTime.Now;
                 }
                 
             }
@@ -315,7 +314,7 @@ namespace TSDBDotNetLib
                 }
                 if (_useDiagnostics)
                 {
-                    DIagnosticCounters.FailedSentDatapoints++;
+                    DiagnosticCounters.FailedSentDatapoints++;
                 }
                 if (OnOTSDBError != null)
                 {
@@ -327,7 +326,7 @@ namespace TSDBDotNetLib
 
                 if (_useDiagnostics)
                 {
-                    DIagnosticCounters.FailedSentDatapoints--;
+                    DiagnosticCounters.FailedSentDatapoints--;
                 }
                 if (OnOTSDBError != null)
                 {
@@ -338,7 +337,7 @@ namespace TSDBDotNetLib
 
             finally
             {
-                this.DIagnosticCounters.PendingPutRequests--;
+                this.DiagnosticCounters.PendingPutRequests--;
             }
 
             return    ;
@@ -377,13 +376,13 @@ namespace TSDBDotNetLib
                 var sw = System.Diagnostics.Stopwatch.StartNew();
                 WebResponse response = await http.GetResponseAsync();
                 sw.Stop();
-                DIagnosticCounters.LastQueryElapsedMs = sw.ElapsedMilliseconds;
+                DiagnosticCounters.LastQueryElapsedMs = sw.ElapsedMilliseconds;
 
                 var streamOutput = response.GetResponseStream();
                 StreamReader sr = new StreamReader(streamOutput);
                 string content = sr.ReadToEnd();
 
-                DIagnosticCounters.LastQueryResponseSize = content.Count();
+                DiagnosticCounters.LastQueryResponseSize = content.Count();
 
                 var results = JsonConvert.DeserializeObject<QueryResult[]>(content);
                 return results[0];
