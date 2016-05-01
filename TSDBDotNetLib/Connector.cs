@@ -21,6 +21,9 @@ namespace TSDBDotNetLib
         public PutOptions           HttpPutOptions { get; set; }
         public bool                 EnqueueFailedDatapoints { get; set; }
         public Diagnostics          DIagnosticCounters { get; set; }
+        internal OTSDBException LastException { get; private set; }
+
+        
 
         public Connector(string url, bool enableDiagnostics=true )
         {
@@ -62,6 +65,27 @@ namespace TSDBDotNetLib
 
                
                 return true;
+            }
+            catch (WebException exc)
+            {
+                if (exc.Response != null)
+                {
+                    StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
+                    var content = reader.ReadToEnd();
+                    var error = JsonConvert.DeserializeObject<ErrorContainer>(content); ;
+                    if (error != null)
+                    {
+                        LastException = error.error;
+                        LastException.time = DateTime.Now;
+                    }
+                    else
+                    {
+                        LastException = null;
+                    }
+
+                }
+                 
+                return false;
             }
             catch (Exception ex)
             {
@@ -174,7 +198,16 @@ namespace TSDBDotNetLib
                 {
                     StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
                     var content = reader.ReadToEnd();
-                    Console.WriteLine(content);
+                    var error = JsonConvert.DeserializeObject<ErrorContainer>(content); ;
+                    if (error != null)
+                    {
+                        LastException = error.error;
+                        LastException.time = DateTime.Now;
+                    }
+                    else
+                    {
+                        LastException = null;
+                    }
                 }
               
                 if (_useDiagnostics)
@@ -245,16 +278,29 @@ namespace TSDBDotNetLib
             }
             catch   (WebException exc)
             {
-                StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
-                var content = reader.ReadToEnd();
-                Console.WriteLine(content);
+                if(exc.Response != null)
+                {
+                    StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
+                    var content = reader.ReadToEnd();
+                    var error = JsonConvert.DeserializeObject<ErrorContainer>(content); ;
+                    if (error != null)
+                    {
+                        LastException = error.error;
+                        LastException.time = DateTime.Now;
+                    }
+                    else
+                    {
+                        LastException = null;
+                    }
+
+                }
                 if (_useDiagnostics)
                 {
                     DIagnosticCounters.FailedSentDatapoints++;
                 }
             }
             catch (Exception exc)
-            {
+            { 
 
                 if (_useDiagnostics)
                 {
@@ -318,9 +364,22 @@ namespace TSDBDotNetLib
             }
             catch (WebException exc)
             {
-                //StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
-                //var content = reader.ReadToEnd();
-                //Console.WriteLine(content);
+                if (exc.Response != null)
+                {
+                    StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
+                    var content = reader.ReadToEnd();
+                    var error = JsonConvert.DeserializeObject<ErrorContainer>(content); ;
+                    if (error != null)
+                    {
+                        LastException = error.error;
+                        LastException.time = DateTime.Now;
+                    }
+                    else
+                    {
+                        LastException = null;
+                    }
+
+                }
                 return null;
                 
             }

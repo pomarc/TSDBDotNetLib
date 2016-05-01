@@ -79,20 +79,20 @@ namespace TSDBDotNetLib
             }
         }
 
-        public object TagsStringTelnet {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var item in Tags.Keys)
-                {
-                    sb.AppendFormat(" {0} ={1} ", item, Tags[item]);
+        //public object TagsStringTelnet {
+        //    get
+        //    {
+        //        StringBuilder sb = new StringBuilder();
+        //        foreach (var item in Tags.Keys)
+        //        {
+        //            sb.AppendFormat(" {0} ={1} ", item, Tags[item]);
 
-                }
+        //        }
 
-                var o = sb.ToString();
-                return o;
-            }
-        }
+        //        var o = sb.ToString();
+        //        return o;
+        //    }
+        //}
 
         //mets
 
