@@ -72,7 +72,7 @@ namespace ConsoleTester
 
                             await _connector.PutAsyncHttp(datapoints);
                             DataPoint[] points = new DataPoint[1];
-                            points[0] = new DataPoint(_diagnosticMetric, _connector.DIagnosticCounters.LastQueryElapsedMs);
+                            points[0] = new DataPoint(_diagnosticMetric, _connector.DiagnosticCounters.LastQueryElapsedMs);
 
                             await _diagnosticConnector.PutAsyncHttp(points);
                              System.Threading.Thread.Sleep(200);
@@ -121,7 +121,7 @@ namespace ConsoleTester
                 QueryParameters queryParams = new QueryParameters();
                 queryParams.StartString = "12h-ago";
                 queryParams.EndString = "1m-ago";
-                queryParams.Metric = "ssystem.env.temperature";
+                queryParams.Metric = "system.env.temperature";
                 queryParams.Tags.Add("site", "rome");
                 queryParams.MillisecondResolution = true;
                 //queryParams.Delete = true;
@@ -139,15 +139,23 @@ namespace ConsoleTester
                 }
                 else
                 {
-                    Console.WriteLine("n. " + results.dps.Count());
+                    if (results.dps == null)
+                    {
+                        Alert("no results.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("found " + results.dps.Count()+" results");
+                    }
+                    
                 }
 
-                Console.WriteLine("elapsed: " + _connector.DIagnosticCounters.LastQueryElapsedMs + "ms");
+                Console.WriteLine("elapsed: " + _connector.DiagnosticCounters.LastQueryElapsedMs + "ms");
 
-                Console.WriteLine("size: " + _connector.DIagnosticCounters.LastQueryResponseSize + "chars");
+                Console.WriteLine("size: " + _connector.DiagnosticCounters.LastQueryResponseSize + "chars");
 
                 DataPoint[] points = new DataPoint[1];
-                points[0] = new DataPoint(_diagnosticMetric, _connector.DIagnosticCounters.LastQueryElapsedMs);
+                points[0] = new DataPoint(_diagnosticMetric, _connector.DiagnosticCounters.LastQueryElapsedMs);
 
                 await _diagnosticConnector.PutAsyncHttp(points);
                    
@@ -178,7 +186,17 @@ namespace ConsoleTester
         static void Main(string[] args)
         {
             //you should put your server name in a server.txt text file inside the /bin/debug dir
-            var serverName = System.IO.File.ReadAllText("server.txt");
+            string serverName = "http://localhost:4242";
+            try
+            {
+                 serverName = System.IO.File.ReadAllText("server.txt");
+            }
+            catch(Exception exc)
+            {
+                Alert("You should put your test server name in a server.txt text file inside the /bin/debug dir. Defaulting to http://localhost:4242");
+
+            }
+
             _connector = new Connector(serverName);
             _connector.OnOTSDBError += _connector_OnOTSDBError;
 
@@ -193,7 +211,7 @@ namespace ConsoleTester
                 GoPut();
                 while (true)
                 {
-                    Console.WriteLine(_connector.DIagnosticCounters.ToString());
+                    Console.WriteLine(_connector.DiagnosticCounters.ToString());
                     System.Threading.Thread.Sleep(5000);
                 }
                 
@@ -204,7 +222,7 @@ namespace ConsoleTester
             }
             else
             {
-                Console.WriteLine("Wrong choice, quitting.");
+                Alert("Wrong choice, quitting.");
             }
 
             Console.WriteLine("press any key");
@@ -229,5 +247,22 @@ namespace ConsoleTester
             Console.WriteLine("-");
             Console.ResetColor();
         }
+
+
+        private static void Alert(string message )
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+          
+            Console.WriteLine(DateTime.Now.ToLongTimeString()+"- "+message);
+            Console.ResetColor();
+        }
+        private static void Error(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            Console.WriteLine(DateTime.Now.ToLongTimeString() + "- " + message);
+            Console.ResetColor();
+        }
+
     }
 }
