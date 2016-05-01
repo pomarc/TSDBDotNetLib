@@ -25,6 +25,7 @@ namespace ConsoleTester
                 if (connectResult)
                 {
                     ulong counter = 0;
+
                     Console.WriteLine("connect successful.");
                     Console.WriteLine(_connector.VersionInfos);
                     try
@@ -74,7 +75,7 @@ namespace ConsoleTester
                             points[0] = new DataPoint(_diagnosticMetric, _connector.DIagnosticCounters.LastQueryElapsedMs);
 
                             await _diagnosticConnector.PutAsyncHttp(points);
-                            // System.Threading.Thread.Sleep(100);
+                             System.Threading.Thread.Sleep(200);
                         }
                     }
                    catch    (Exception ex)
@@ -87,7 +88,12 @@ namespace ConsoleTester
                 }
                 else
                 {
-                    Console.WriteLine("connect unsuccessful.");
+
+                        Console.ForegroundColor = ConsoleColor.Red;
+
+                        Console.WriteLine("couldn't connect. aborting.");
+                        Console.ResetColor();
+                    
 
                 }
 
@@ -115,7 +121,7 @@ namespace ConsoleTester
                 QueryParameters queryParams = new QueryParameters();
                 queryParams.StartString = "12h-ago";
                 queryParams.EndString = "1m-ago";
-                queryParams.Metric = "system.env.temperature";
+                queryParams.Metric = "ssystem.env.temperature";
                 queryParams.Tags.Add("site", "rome");
                 queryParams.MillisecondResolution = true;
                 //queryParams.Delete = true;
@@ -148,6 +154,14 @@ namespace ConsoleTester
 
 
             }
+            else
+            {
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                
+                Console.WriteLine("couldn't connect. aborting.");
+                Console.ResetColor();
+            }
 
 
         }
@@ -166,6 +180,8 @@ namespace ConsoleTester
             //you should put your server name in a server.txt text file inside the /bin/debug dir
             var serverName = System.IO.File.ReadAllText("server.txt");
             _connector = new Connector(serverName);
+            _connector.OnOTSDBError += _connector_OnOTSDBError;
+
             _diagnosticConnector = new Connector("http://localhost:4242");
             _diagnosticMetric = new Metric("diagnostics.elapsed");
             _diagnosticMetric.Tags.Add("server", "dockercloud");
@@ -195,6 +211,23 @@ namespace ConsoleTester
             Console.ReadKey();
 
 
+        }
+
+        private static void _connector_OnOTSDBError(OTSDBException exc, Exception originalException)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("exception. ");
+            if (exc != null)
+            {
+                Console.Write(exc.time.ToLongTimeString()+" "+ exc.code+": "+exc.message );
+                
+            }
+            else
+            {
+                Console.Write( originalException.Message);
+            }
+            Console.WriteLine("-");
+            Console.ResetColor();
         }
     }
 }
