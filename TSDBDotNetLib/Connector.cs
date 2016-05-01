@@ -23,7 +23,10 @@ namespace TSDBDotNetLib
         public Diagnostics          DIagnosticCounters { get; set; }
         internal OTSDBException LastException { get; private set; }
 
-        
+        public delegate void OTSDBErrorDelegate(OTSDBException exception, Exception originalException);
+
+        public event OTSDBErrorDelegate OnOTSDBError;
+
 
         public Connector(string url, bool enableDiagnostics=true )
         {
@@ -68,6 +71,7 @@ namespace TSDBDotNetLib
             }
             catch (WebException exc)
             {
+                
                 if (exc.Response != null)
                 {
                     StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
@@ -83,12 +87,21 @@ namespace TSDBDotNetLib
                         LastException = null;
                     }
 
+                    if (OnOTSDBError != null)
+                    {
+                        OnOTSDBError(LastException, exc);
+                    }
+
                 }
                  
                 return false;
             }
             catch (Exception ex)
             {
+                if (OnOTSDBError != null)
+                {
+                    OnOTSDBError(null, ex);
+                }
                 return false;
             }
 
@@ -194,6 +207,7 @@ namespace TSDBDotNetLib
             }
             catch (WebException exc)
             {
+                LastException = null;
                 if (exc.Response != null)
                 {
                     StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
@@ -204,15 +218,16 @@ namespace TSDBDotNetLib
                         LastException = error.error;
                         LastException.time = DateTime.Now;
                     }
-                    else
-                    {
-                        LastException = null;
-                    }
+                    
                 }
               
                 if (_useDiagnostics)
                 {
                     DIagnosticCounters.FailedSentDatapoints+=(ulong)dataPoints.Count();
+                }
+                if (OnOTSDBError != null)
+                {
+                    OnOTSDBError(LastException, exc);
                 }
             }
             catch (Exception exc)
@@ -220,7 +235,12 @@ namespace TSDBDotNetLib
             
                 if (_useDiagnostics)
                 {
+
                     DIagnosticCounters.FailedSentDatapoints += (ulong)dataPoints.Count();
+                }
+                if (OnOTSDBError != null)
+                {
+                    OnOTSDBError(null, exc);
                 }
             }
             finally
@@ -278,7 +298,8 @@ namespace TSDBDotNetLib
             }
             catch   (WebException exc)
             {
-                if(exc.Response != null)
+                LastException = null;
+                if (exc.Response != null)
                 {
                     StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
                     var content = reader.ReadToEnd();
@@ -288,15 +309,17 @@ namespace TSDBDotNetLib
                         LastException = error.error;
                         LastException.time = DateTime.Now;
                     }
-                    else
-                    {
-                        LastException = null;
-                    }
+                   
+                   
 
                 }
                 if (_useDiagnostics)
                 {
                     DIagnosticCounters.FailedSentDatapoints++;
+                }
+                if (OnOTSDBError != null)
+                {
+                    OnOTSDBError(LastException, exc);
                 }
             }
             catch (Exception exc)
@@ -305,6 +328,10 @@ namespace TSDBDotNetLib
                 if (_useDiagnostics)
                 {
                     DIagnosticCounters.FailedSentDatapoints--;
+                }
+                if (OnOTSDBError != null)
+                {
+                    OnOTSDBError(null, exc);
                 }
             }
             
@@ -379,12 +406,25 @@ namespace TSDBDotNetLib
                         LastException = null;
                     }
 
+                    if (OnOTSDBError != null)
+                    {
+                        OnOTSDBError(LastException, exc);
+                    }
+                    return null;
+                }
+                if (OnOTSDBError != null)
+                {
+                    OnOTSDBError(LastException, exc);
                 }
                 return null;
                 
             }
             catch (Exception exc)
             {
+                if (OnOTSDBError != null)
+                {
+                    OnOTSDBError(null, exc);
+                }
                 return null;
 
             }
