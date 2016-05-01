@@ -33,7 +33,13 @@ namespace TSDBDotNetLib
 
             }
         }
+        public void Reset()
+        {
+            StartDate = LastSuccessfulPut= DateTime.MinValue;
+            SentDatapoints = SuccessfulSentDatapoints = FailedSentDatapoints = 0;
+            PendingPutRequests = LastQueryElapsedMs = LastQueryResponseSize = 0;
 
+        }
         override public  string  ToString()
         {
             var outMessage = String.Format("Start Date: {0}\r\nLast Successful Put:{1}\r\nSent data points: {2}\t Successful: {3}\t sent-successful {7}  Failed: {4}\t Pending put rqs:{5}\r\nRate: {6} put/ms\r\nLast query elapsed: {8}ms\tLast successful query response size:{9} chars\r\n",
