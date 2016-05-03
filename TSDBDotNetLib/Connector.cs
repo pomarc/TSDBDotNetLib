@@ -15,6 +15,8 @@ namespace TSDBDotNetLib
     {
         private Uri _ServerUri = new Uri("http://127.0.0.1:4242");     
         private bool _useDiagnostics = true;
+
+
         private Queue<DataPoint> _datapointsQueue { get; set; }
         public VersionInfo VersionInfos { get; set; }
 
@@ -26,7 +28,7 @@ namespace TSDBDotNetLib
         public delegate void OTSDBErrorDelegate(OTSDBException exception, Exception originalException);
 
         public event OTSDBErrorDelegate OnOTSDBError;
-
+ 
 
         public Connector(string url, bool enableDiagnostics=true )
         {
@@ -39,7 +41,7 @@ namespace TSDBDotNetLib
         }
 
 
-        public   async Task<bool> Connect()
+        public   async Task<bool> TestConnection()
         {
 
             try
@@ -108,8 +110,9 @@ namespace TSDBDotNetLib
 
         }
 
-        public async Task PutAsyncHttp(DataPoint[] dataPoints)
+        public async Task<PutResult> PutAsyncHttp(DataPoint[] dataPoints)
         {
+            PutResult result = new PutResult();
             try
             {
                 if (_useDiagnostics)
@@ -176,18 +179,22 @@ namespace TSDBDotNetLib
                 string content = sr.ReadToEnd();
 
                 DiagnosticCounters.LastQueryResponseSize = response.ContentLength;
-
-                if (_useDiagnostics)
+                PutDetails details = null;
+                if (HttpPutOptions.Details || HttpPutOptions.Summary)
                 {
-                    if (HttpPutOptions.Details|| HttpPutOptions.Summary)
-                    {
-                        //try to parse the response
+                    //try to parse the response
 
-                        dynamic converter = Newtonsoft.Json.JsonConvert.DeserializeObject<PutDetails>(content);
+                    details = Newtonsoft.Json.JsonConvert.DeserializeObject<PutDetails>(content);
+                    result.details = details;
+                }
 
-                        DiagnosticCounters.SuccessfulSentDatapoints += (ulong) converter.success;
-                        DiagnosticCounters.FailedSentDatapoints += (ulong)converter.failed;
-                        if (converter.success > 0)
+
+                    if (_useDiagnostics && details!=null)
+                {
+                    
+                        DiagnosticCounters.SuccessfulSentDatapoints += (ulong) details.success;
+                        DiagnosticCounters.FailedSentDatapoints += (ulong)details.failed;
+                        if (details.success > 0)
                         {
                             DiagnosticCounters.LastSuccessfulPut = DateTime.Now;
                         }
@@ -201,11 +208,11 @@ namespace TSDBDotNetLib
                         DiagnosticCounters.LastSuccessfulPut = DateTime.Now;
                     }
                  
-                }
-
+                 
             }
             catch (WebException exc)
             {
+                
                 LastException = null;
                 if (exc.Response != null)
                 {
@@ -228,9 +235,13 @@ namespace TSDBDotNetLib
                 {
                     OnOTSDBError(LastException, exc);
                 }
+
+                result.OtsbException = LastException;
+                result.originalException = exc;
             }
             catch (Exception exc)
             {
+
             
                 if (_useDiagnostics)
                 {
@@ -241,18 +252,22 @@ namespace TSDBDotNetLib
                 {
                     OnOTSDBError(null, exc);
                 }
+                result.originalException = exc;
             }
             finally
             {
                 this.DiagnosticCounters.PendingPutRequests--;
             }
 
-            return;
+            return result;
         }
-        public async Task  PutAsyncHttp(DataPoint dataPoint)
+        public async Task<PutResult>  PutAsyncHttp(DataPoint dataPoint)
         {
+            PutResult result = new PutResult();
             try
             {
+               
+
                 if (_useDiagnostics)
                 {
                     DiagnosticCounters.SentDatapoints++;
@@ -288,6 +303,14 @@ namespace TSDBDotNetLib
                 StreamReader sr = new StreamReader(streamOutput);
                 string content = sr.ReadToEnd();
 
+                PutDetails details = null;
+                if (HttpPutOptions.Details || HttpPutOptions.Summary)
+                {
+                    //try to parse the response
+
+                    details = Newtonsoft.Json.JsonConvert.DeserializeObject<PutDetails>(content);
+                    result.details = details;
+                }
                 if (_useDiagnostics)
                 {
                     DiagnosticCounters.SuccessfulSentDatapoints++;
@@ -320,6 +343,8 @@ namespace TSDBDotNetLib
                 {
                     OnOTSDBError(LastException, exc);
                 }
+                result.OtsbException = LastException;
+                result.originalException = exc;
             }
             catch (Exception exc)
             { 
@@ -332,6 +357,8 @@ namespace TSDBDotNetLib
                 {
                     OnOTSDBError(null, exc);
                 }
+                
+                result.originalException = exc;
             }
             
 
@@ -340,7 +367,7 @@ namespace TSDBDotNetLib
                 this.DiagnosticCounters.PendingPutRequests--;
             }
 
-            return    ;
+            return result; ;
         }
 
         public async Task<QueryResult> QueryAsyncHttp(QueryParameters queryParameters)
