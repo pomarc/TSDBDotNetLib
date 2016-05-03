@@ -38,15 +38,15 @@ namespace ConsoleTester
                             var rnd = new Random();
 
                             _connector.HttpPutOptions.Summary = true;
-                            DataPoint datapoint = new DataPoint("metrica4.sottometrica.subsub", DateTime.Now, counter);
+                            DataPoint datapoint = new DataPoint("metrica4.sottometrica.subsub", counter, DateTime.Now);
 
                             datapoint.Tags.Add("site", "rome");
 
 
-                            DataPoint datapoint1 = new DataPoint("metrica4.sottometrica.subsub", DateTime.Now, counter);
+                            DataPoint datapoint1 = new DataPoint("metrica4.sottometrica.subsub" , counter, DateTime.Now);
 
                             datapoint1.Tags.Add("site", "perugia");
-                            DataPoint datapoint3 = new DataPoint("metrica4.sottometrica.subsub", DateTime.Now, counter);
+                            DataPoint datapoint3 = new DataPoint("metrica4.sottometrica.subsub" , counter, DateTime.Now);
 
                             datapoint3.Tags.Add("site", "milan");
 

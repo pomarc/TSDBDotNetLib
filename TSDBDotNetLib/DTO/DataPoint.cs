@@ -27,7 +27,7 @@ namespace TSDBDotNetLib
             this.Value = Value;
             this.Timestamp = DateTime.Now;
         }
-        public DataPoint(string Metric, System.DateTime TimeStamp,double Value ) 
+        public DataPoint(string Metric, double Value, System.DateTime TimeStamp ) 
         {
             Tags = new Dictionary<string, string>();
             this.Metric = Metric;

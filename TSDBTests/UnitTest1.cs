@@ -10,7 +10,7 @@ namespace TSDBTests
         [TestMethod]
         public void TestMethod1()
         {
-            DataPoint datapoint = new DataPoint("sys.meter.uno", DateTime.Now, 12);
+            DataPoint datapoint = new DataPoint("sys.meter.uno",   12, DateTime.Now);
             datapoint.Tags.Add("tag1", "value");
          
             TSDBDotNetLib.Connector connector = new Connector(@"http://localhost:4242");
