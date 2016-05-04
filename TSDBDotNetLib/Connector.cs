@@ -236,6 +236,7 @@ namespace TSDBDotNetLib
                     OnOTSDBError(LastException, exc);
                 }
 
+                result.HasErrors = true;
                 result.OtsbException = LastException;
                 result.originalException = exc;
             }
@@ -252,6 +253,7 @@ namespace TSDBDotNetLib
                 {
                     OnOTSDBError(null, exc);
                 }
+                result.HasErrors = true;
                 result.originalException = exc;
             }
             finally
@@ -343,6 +345,7 @@ namespace TSDBDotNetLib
                 {
                     OnOTSDBError(LastException, exc);
                 }
+                result.HasErrors = true;
                 result.OtsbException = LastException;
                 result.originalException = exc;
             }
@@ -357,7 +360,7 @@ namespace TSDBDotNetLib
                 {
                     OnOTSDBError(null, exc);
                 }
-                
+                result.HasErrors = true;
                 result.originalException = exc;
             }
             

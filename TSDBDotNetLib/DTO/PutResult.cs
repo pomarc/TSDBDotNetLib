@@ -8,6 +8,7 @@ namespace TSDBDotNetLib
 {
     public class PutResult
     {
+        public bool HasErrors { get; set; }
         public OTSDBException OtsbException { get; set; }
 
         public Exception originalException { get; set; }
