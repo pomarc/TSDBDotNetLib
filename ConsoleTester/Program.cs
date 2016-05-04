@@ -13,6 +13,132 @@ namespace ConsoleTester
         static Connector _connector;
         private static Connector _diagnosticConnector;
         private static Metric _diagnosticMetric;
+       
+
+        static async Task ReadmeExample()
+        {
+            
+            var tParis = 34; var tRome = 32.3; var hRome = 0.34;
+
+            string serverName = "http://localhost:4242";
+            Connector connector = new Connector(serverName);
+            int _exceptioncounter = 0;
+
+            var connectResult = await connector.TestConnection();
+            if (connectResult)
+            {
+                ulong counter = 0;
+
+                Console.WriteLine("connect successful.");
+                Console.WriteLine(_connector.VersionInfos);
+                try
+                {
+
+
+                    
+
+
+                  
+                    connector.OnOTSDBError += (ex1, exo) =>
+                    {
+                        _exceptioncounter++;
+                    };
+
+                    connector.HttpPutOptions.Summary = true;
+
+
+                    //let's define a base metric we can reuse
+                    //these should be define elsewhere and reused
+                    Metric systemEnv = new Metric() { Key = "system.dc.diagnostics" };
+
+                    //let's make a base metric for the Rome site
+                    Metric systemEnvRome = new Metric(systemEnv);
+                    systemEnvRome.Tags.Add("site", "rome");
+
+                    //let's define two metrics for the Rome site
+                    Metric systemEnvTemperatureRome = new Metric(systemEnvRome, "temperature");
+                    Metric systemEnvHumidityRome = new Metric(systemEnvRome, "humidity");
+
+                    //same for Paris, just temp
+                    Metric SystemEnvTemperatureParis = new Metric(systemEnv, "temperature");
+                    SystemEnvTemperatureParis.Tags.Add("site", "paris");
+
+
+                    DataPoint datapoint1 = new DataPoint(systemEnvTemperatureRome, tRome);
+                    DataPoint datapoint2 = new DataPoint(systemEnvHumidityRome, hRome);
+                    DataPoint datapoint3 = new DataPoint(SystemEnvTemperatureParis, tParis);
+
+                    
+                    DataPoint[] datapoints = new DataPoint[] { datapoint1, datapoint2, datapoint3 };
+
+                    //let's put the datapoints to the server
+                    var results= await connector.PutAsyncHttp(datapoints);
+
+                    if (results.HasErrors)
+                    {
+                        Console.Write("an error has occourred: ");
+                        if (results.OtsbException!= null)
+                        {
+                            Console.Write(results.OtsbException.message);
+                        }
+                        else
+                        {
+                            Console.Write(results.originalException.Message);
+                        }
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        Console.WriteLine("ok." +results.details.success+" points saved");
+                    }
+
+
+                    //let's wtite out the statistics:
+                    Console.WriteLine(connector.DiagnosticCounters.ToString());
+
+
+                    //let's ask back the temperature for the Rome datacenter:
+
+                    QueryParameters queryParams = new QueryParameters();
+                    queryParams.StartString = "12h-ago";
+                    queryParams.EndString = "1m-ago";
+                    queryParams.Metric = "system.dc.diagnostics.temperature";
+                    queryParams.Tags.Add("site", "rome");
+                    queryParams.MillisecondResolution = true;
+                    queryParams.Aggregator = Aggregators.avg;
+                   
+                    ;
+                    var queryResults = connector.QueryAsyncHttp(queryParams).Result;
+
+                    foreach (var i in queryResults.dps)
+                    {
+                        Console.WriteLine(  UnixTimeStampToDateTime(Double.Parse(i.Key)).ToString("yyyyMMdd HH:mm:ss.fff") + ": " + i.Value);
+                    }
+
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("aborting put, exception: " + ex.Message);
+
+                }
+
+
+            }
+            else
+            {
+
+                Console.ForegroundColor = ConsoleColor.Red;
+
+                Console.WriteLine("couldn't connect. aborting.");
+                Console.ResetColor();
+
+
+            }
+
+
+        }
+ 
 
         static async Task GoPut()
         {
@@ -21,7 +147,7 @@ namespace ConsoleTester
             {
 
 
-                var connectResult = await _connector.Connect();
+                var connectResult = await _connector.TestConnection();
                 if (connectResult)
                 {
                     ulong counter = 0;
@@ -110,7 +236,7 @@ namespace ConsoleTester
         public static async Task GoQuery()
         {
 
-            var connectResult = await _connector.Connect();
+            var connectResult = await _connector.TestConnection();
             if (connectResult)
             {
                 ulong counter = 0;
@@ -124,6 +250,7 @@ namespace ConsoleTester
                 queryParams.Metric = "system.env.temperature";
                 queryParams.Tags.Add("site", "rome");
                 queryParams.MillisecondResolution = true;
+                queryParams.Aggregator = Aggregators.avg;
                 //queryParams.Delete = true;
                 ;
                 var results = _connector.QueryAsyncHttp(queryParams).Result;
@@ -204,7 +331,7 @@ namespace ConsoleTester
             _diagnosticMetric = new Metric("diagnostics.elapsed");
             _diagnosticMetric.Tags.Add("server", "dockercloud");
 
-            Console.WriteLine("press 1 for put, 2 for query then enter.");
+            Console.WriteLine("press 1 for put, 2 for query, 3 for readme demo, then enter.");
             var c = Console.ReadLine();
             if (c.StartsWith("1"))
             {
@@ -219,6 +346,11 @@ namespace ConsoleTester
             if (c.StartsWith("2"))
             {
                   GoQuery().Wait();
+            }
+            else
+            if (c.StartsWith("3"))
+            {
+                ReadmeExample().Wait();
             }
             else
             {
