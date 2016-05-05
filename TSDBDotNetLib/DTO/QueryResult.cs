@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TSDBDotNetLib
 {
@@ -7,6 +8,12 @@ namespace TSDBDotNetLib
     
     public class QueryResult
     {
+
+        public bool HasErrors { get; set; }
+        public OTSDBException OtsbException { get; set; }
+
+        public Exception originalException { get; set; }
+
         public string metric { get; set; }
         public Dictionary<string, string> tags { get; set; }
         public List<string> aggregatedTags { get; set; }

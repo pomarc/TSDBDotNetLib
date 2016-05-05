@@ -424,6 +424,9 @@ namespace TSDBDotNetLib
             }
             catch (WebException exc)
             {
+                result.HasErrors = true;
+                result.originalException = exc;
+
                 if (exc.Response != null)
                 {
                     StreamReader reader = new StreamReader(exc.Response.GetResponseStream());
@@ -433,6 +436,8 @@ namespace TSDBDotNetLib
                     {
                         LastException = error.error;
                         LastException.time = DateTime.Now;
+                        result.OtsbException = LastException;
+                      
                     }
                     else
                     {
@@ -443,22 +448,24 @@ namespace TSDBDotNetLib
                     {
                         OnOTSDBError(LastException, exc);
                     }
-                    return null;
+                    
                 }
                 if (OnOTSDBError != null)
                 {
                     OnOTSDBError(LastException, exc);
                 }
-                return null;
+                return result;
                 
             }
             catch (Exception exc)
             {
+                result.HasErrors = true;
+                result.originalException = exc;
                 if (OnOTSDBError != null)
                 {
                     OnOTSDBError(null, exc);
                 }
-                return null;
+                return result;
 
             }
             finally
