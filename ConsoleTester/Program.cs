@@ -110,9 +110,17 @@ namespace ConsoleTester
                     ;
                     var queryResults = connector.QueryAsyncHttp(queryParams).Result;
 
-                    foreach (var i in queryResults.dps)
+                    if (!queryResults.HasErrors)
                     {
-                        Console.WriteLine(  UnixTimeStampToDateTime(Double.Parse(i.Key)).ToString("yyyyMMdd HH:mm:ss.fff") + ": " + i.Value);
+
+                        foreach (var i in queryResults.dps)
+                        {
+                            Console.WriteLine(UnixTimeStampToDateTime(Double.Parse(i.Key)).ToString("yyyyMMdd HH:mm:ss.fff") + ": " + i.Value);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("an error has occourred");
                     }
 
 
