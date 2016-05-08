@@ -72,7 +72,7 @@ namespace ConsoleTester
                     DataPoint[] datapoints = new DataPoint[] { datapoint1, datapoint2, datapoint3 };
 
                     //let's put the datapoints to the server
-                    var results= await connector.PutAsyncHttp(datapoints);
+                    var results= await connector.PutHttpAsync(datapoints);
 
                     if (results.HasErrors)
                     {
@@ -108,7 +108,7 @@ namespace ConsoleTester
                     queryParams.Aggregator = Aggregators.avg;
                    
                     ;
-                    var queryResults = connector.QueryAsyncHttp(queryParams).Result;
+                    var queryResults = connector.QueryHttpAsync(queryParams).Result;
 
                     if (!queryResults.HasErrors)
                     {
@@ -204,11 +204,11 @@ namespace ConsoleTester
                             DataPoint[] datapoints = new DataPoint[] { datapoint1, datapoint, datapoint3, datapoint4, datapoint5, datapoint6 };
 
 
-                            await _connector.PutAsyncHttp(datapoints);
+                            await _connector.PutHttpAsync(datapoints);
                             DataPoint[] points = new DataPoint[1];
                             points[0] = new DataPoint(_diagnosticMetric, _connector.DiagnosticCounters.LastQueryElapsedMs);
 
-                            await _diagnosticConnector.PutAsyncHttp(points);
+                            await _diagnosticConnector.PutHttpAsync(points);
                              System.Threading.Thread.Sleep(200);
                         }
                     }
@@ -261,7 +261,7 @@ namespace ConsoleTester
                 queryParams.Aggregator = Aggregators.avg;
                 //queryParams.Delete = true;
                 ;
-                var results = _connector.QueryAsyncHttp(queryParams).Result;
+                var results = _connector.QueryHttpAsync(queryParams).Result;
            
                 /* foreach (var i in results.dps)
                  {
@@ -292,7 +292,7 @@ namespace ConsoleTester
                 DataPoint[] points = new DataPoint[1];
                 points[0] = new DataPoint(_diagnosticMetric, _connector.DiagnosticCounters.LastQueryElapsedMs);
 
-                await _diagnosticConnector.PutAsyncHttp(points);
+                await _diagnosticConnector.PutHttpAsync(points);
                    
 
 

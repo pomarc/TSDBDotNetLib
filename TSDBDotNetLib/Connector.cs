@@ -110,7 +110,7 @@ namespace TSDBDotNetLib
 
         }
 
-        public async Task<PutResult> PutAsyncHttp(DataPoint[] dataPoints)
+        public async Task<PutResult> PutHttpAsync(DataPoint[] dataPoints)
         {
             PutResult result = new PutResult();
             try
@@ -263,7 +263,7 @@ namespace TSDBDotNetLib
 
             return result;
         }
-        public async Task<PutResult>  PutAsyncHttp(DataPoint dataPoint)
+        public async Task<PutResult> PutHttpAsync(DataPoint dataPoint)
         {
             PutResult result = new PutResult();
             try
@@ -373,7 +373,7 @@ namespace TSDBDotNetLib
             return result; ;
         }
 
-        public async Task<QueryResult> QueryAsyncHttp(QueryParameters queryParameters)
+        public async Task<QueryResult> QueryHttpAsync(QueryParameters queryParameters)
         {
             QueryResult result = new QueryResult();
             try
