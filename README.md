@@ -1,8 +1,7 @@
 [](#tsdbnetlib)TSDBDotNetLib
 =========================
 
-TSDBNetLib is a .Net library written in c\# to connect .NET applications
-connect to an OpenTSDB (open time series data base) server through the
+TSDBNetLib is a .Net library written in c\# to connect .NET applications to an OpenTSDB (open time series data base) server through the
 http API. TSDBNetLib provides simple and efficient ways to save and
 retrieve time series data points in a type safe manner.
 
