@@ -14,11 +14,8 @@ retrieve time series data points in a type safe manner.
 [](#version)Version
 -------------------
 
-Current version is `0.1.0` This library tries to implement [Semantic
-Versioning](http://semver.org/). The library is under *heavy*
-development, so please expect many breaking changes in the next
-releases, many bugs and incomplete test suites and docs.
-
+Current version is `0.1.0`  The library is under *heavy*
+development.
 [](#installation-and-testing)Installation and testing
 -----------------------------------------------------
 
